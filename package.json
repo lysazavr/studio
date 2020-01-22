@@ -1,0 +1,34 @@
+{
+  "name"       : "RightPath",
+  "version"    : "1.0.0",
+  "description": "Test project",
+  "main"       : "index.js",
+  "repository" : {
+    "private": true
+  },
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp"
+  },
+  "author"      : "lusine",
+  "license"     : "ISC",
+  "dependencies": {
+    "gulp-minify-css": "^1.2.4",
+    "gulp-sourcemaps": "^1.5.0",
+    "jquery"         : "^3.3.1",
+    "owl.carousel"   : "^2.3.4",
+    "slick-carousel" : "^1.8.1"
+  },
+  "devDependencies": {
+    "browser-sync"     : "^2.26.3",
+    "del"              : "^3.0.0",
+    "gulp"             : "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-concat"      : "^2.6.1",
+    "gulp-imagemin"    : "^4.1.0",
+    "gulp-less"        : "^4.0.1",
+    "gulp-rimraf"      : "^0.2.2",
+    "gulp-uglify"      : "^1.2.0",
+    "gulp-watch"       : "^5.0.1"
+  }
+}
