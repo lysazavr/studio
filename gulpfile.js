@@ -9,15 +9,14 @@ const cssmin     = require('gulp-minify-css');
 const less       = require('gulp-less');
 const imagemin   = require('gulp-imagemin');
 const browser    = require('browser-sync').create();
+const pug        = require('gulp-pug');
 
 var port = process.env.SERVER_PORT || 3000;
 
 // refers to my build directory and or files to
 // to delete
 var toDelete = [
-  'build/js/*.js',
-  'build/css/*.css',
-  'build/img/*'
+  'build/*',
 ]
 
 const path = {
@@ -29,14 +28,14 @@ const path = {
           fonts: 'build/fonts/'
         }, 
     src : { //Пути откуда брать исходники
-        html : 'src/*.html',          //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
+        html : 'src/pages/*.pug',     //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
         js   : 'src/js/main.js',      //В стилях и скриптах нам понадобятся только main файлы
         style: 'src/css/main.less',
         img  : 'src/img/**/*.*',      //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
         fonts: 'src/fonts/**/*.*'
         },
     watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
-        html : 'src/**/*.html',
+        html : 'src/**/*.pug',
         js   : 'src/js/**/*.js',
         style: 'src/css/**/*.less',
         img  : 'src/img/**/*.*',
@@ -48,7 +47,11 @@ const path = {
 const vendorJs = [
     'node_modules/jquery/dist/jquery.js',
     'node_modules/slick-carousel/slick/slick.min.js',
-    'node_modules/owl.carousel/dist/owl.carousel.min.js'
+];
+
+const vendorCss = [
+  'node_modules/slick-carousel/slick/slick.css',
+  'node_modules/slick-carousel/slick/slick-theme.css',
 ];
 
 // TASKS BEGIN
@@ -66,7 +69,8 @@ gulp.task('font', function() {
 
 // concacts and minifys all personally written JS
 gulp.task('js', function() {
-    vendorJs.push(path.src.js)
+  vendorJs.push(path.src.js)
+  
   let stream = gulp.src(vendorJs)
     .pipe(concat('main.js'))
     .pipe(uglify())
@@ -76,7 +80,9 @@ gulp.task('js', function() {
 
 // Minify personally written css to at least ie8 compatibility
 gulp.task('css', function() {
-  const stream = gulp.src(path.src.style)  //Выберем наш main.less
+  vendorCss.push(path.src.style)
+
+  const stream = gulp.src(vendorCss)  //Выберем наш main.less
     .pipe(sourcemaps.init()) //То же самое что и с js
     .pipe(less()) //Скомпилируем
     .pipe(prefixer()) //Добавим вендорные префиксы
@@ -88,6 +94,7 @@ return stream;
 
 gulp.task('html', function() {
     return gulp.src(path.src.html) //Выберем файлы по нужному пути
+        .pipe(pug({}))
         .pipe(gulp.dest(path.build.html)); //И перезагрузим наш сервер для обновлений
 })
 
@@ -116,7 +123,7 @@ gulp.task('browser', function() {
     .on('change', browser.reload);
 
   // Reload when html changes
-  gulp.watch(path.src.html, gulp.parallel('html'))
+  gulp.watch(path.watch.html, gulp.parallel('html'))
     .on('change', browser.reload);
 
   // Reload when image changes
@@ -128,6 +135,7 @@ gulp.task('browser', function() {
 // Then subsequent tasks can be asynchronous in executing
 gulp.task('serve', gulp.series('clean',
   gulp.parallel(
+    'html',
     'js',
     'css',
     'font',
@@ -138,6 +146,7 @@ gulp.task('serve', gulp.series('clean',
 gulp.task('default', gulp.series('serve'));
 
 gulp.task('build', gulp.series('clean', 
+        'html',
         'js', 
         'css',
         'font',
